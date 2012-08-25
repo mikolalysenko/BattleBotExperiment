@@ -1,0 +1,31 @@
+<html>
+<head>
+  <title> Select a login provider </title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link  href="css/main.css" rel="stylesheet"/>
+</head>
+
+<body>
+  <div align="center">
+    <p> <img src="images/openid-logo.png" width="300px"/></p>
+  
+    <p> Please login using an OpenID provider: </p>
+  
+    <p> <a href="authenticate?identifier=https://www.google.com/accounts/o8/id"><img src="images/google.png" width=120px/></a>  </p>
+    
+    <p> ...or enter your own URL: </p>
+    <p> <input type="text" id="customProvider" /> <input type="submit" id="submitCustom" /> </p>
+    
+    <p> ...or just skip it: </p>
+    <p> <a href="authenticate?identifier=temporary"> Temporary Login <b>(Warning!  No saving!)</b> </a> </p>
+    
+<script>
+document.getElementById("submitCustom").addEventListener('click', function(ev) {
+  window.location = window.location.origin + '/authenticate?identifier=' + escape(document.getElementById('customProvider').value);
+});
+</script>
+  
+  </div>
+</body>
+</html>

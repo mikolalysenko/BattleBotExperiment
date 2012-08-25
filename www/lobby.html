@@ -1,0 +1,64 @@
+<html>
+<head>
+  <title> Lobby </title>
+  <script src="/browserify.js"></script>
+	<link  href="css/game.css" rel="stylesheet"/>
+</head>
+
+<body>
+  <div id="lobbyPage">
+    <div id="roomsList">
+    </div>
+    
+    <div id="lobbyPanel">
+      <div id="lobbyStatus">
+        <div id="lobbyPlayerName"> </div>
+      </div>
+      <div id="lobbyButtons">
+        <input type="button" id="lobbyRefresh" value="Refresh" />
+        <input type="button" id="lobbyEdit" value="Evolve Creature" />
+        <p>
+          <input type="button" id="lobbyCreateRoom" value="Create Room" />
+          <input type="text" id="lobbyRoomName" value="Room Name" />
+        </p>
+      </div>
+      <div id="lobbyErrors" class="errorBox"> </div>
+    </div>
+  </div>
+  
+  <div id="roomPage">
+    <div id="roomChat">
+    </div>
+  
+    <div id="roomPanel">
+      <div id="roomName"></div>
+      <div id="roomPlayers">
+        Players:
+      </div>
+      <div id="roomButtons">
+        <p> Ready: <input type="checkbox" id="roomReady" /> </p>
+        <input type="button" id="roomLeave" value="Leave" />
+      </div>
+      <div id="roomErrors" class="errorBox"> </div>
+    </div>
+  </div>
+  
+  <div id="editPage">
+    <canvas id="editCanvas"></canvas>
+    <div id="editErrors" class="errorBox"></div>
+  </div>
+  
+  <div id="battlePage">
+    <div id="battleChat">
+    </div>
+    <canvas id="battleCanvas"></canvas>
+    <div id="battleErrors" class="errorBox"></div>
+    <div id="battlePanel">
+      Status
+      
+      <input type="button" id="battleReady" value="Execute" />
+      <input type="button" id="battleResign" value="Resign" />
+    </div>
+  </div>
+</body>
+</html>
