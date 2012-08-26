@@ -207,7 +207,7 @@ exports.createLobbyService = function(app, cb) {
       }
     });
     
-    session.on('logout', function(session) {
+    session.on('logout', function() {
       leaveRoom(session);
     });
   });

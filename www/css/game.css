@@ -9,6 +9,10 @@ body {
 	font-size	: 100%;
 }
 
+canvas {
+  background-color:#333333;
+}
+
 #lobbyPage {
   display: none;
 }
@@ -28,3 +32,4 @@ body {
 .errorBox {
   color: red;
 }
+

@@ -6009,7 +6009,12 @@ Box2D.postDefs = [];
             for (f = b.GetFixtureList();
             f; f = f.m_next) {
                s = f.GetShape();
-               if (b.IsActive() == false) {
+               var ud = f.GetBody().GetUserData();
+               if(ud && 'color' in ud) {
+                 color.Set(ud.color[0], ud.color[1], ud.color[2]);
+                 this.DrawSahpe(s, xf, color);
+               }
+               else if (b.IsActive() == false) {
                   color.Set(0.5, 0.5, 0.3);
                   this.DrawShape(s, xf, color);
                }

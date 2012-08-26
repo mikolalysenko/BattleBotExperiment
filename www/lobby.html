@@ -44,8 +44,20 @@
   </div>
   
   <div id="editPage">
-    <canvas id="editCanvas"></canvas>
-    <div id="editErrors" class="errorBox"></div>
+    <canvas id="editCanvas" width="600" height="400"></canvas>
+    <div id="editPanel">
+      <select id="editTool">
+        <option id="editToolBox" value="box">Box</option>
+        <option id="editToolMove" value="move">Move</option>
+        <option id="editToolJoint" value="joint">Joint</option>
+      </select>
+      
+      <input type="button" id="editSave" value="Save" />
+      <input type="button" id="editBack" value="Back to Lobby" />
+    
+      <p>Paused: <input type="checkbox" id="editPaused"/></p>
+      <div id="editErrors" class="errorBox"></div>
+    </div>
   </div>
   
   <div id="battlePage">
