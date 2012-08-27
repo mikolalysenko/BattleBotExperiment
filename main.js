@@ -6,7 +6,7 @@ var options = {
   , http_url : "http://localhost:8080/"
   , http_port : 8080
   , login_page : 'index.html'
-  , lobby_page : 'lobby.html'
+  , lobby_page : 'index.html'
   , session_timeout: 5 * 60 * 1000
   , debug: true
 };

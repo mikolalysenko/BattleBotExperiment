@@ -6,7 +6,8 @@ var misc = require('./misc.js')
   };
 
 var pages = {
-    "Lobby":  require('./lobby_page.js')
+    "Login":  require('./login_page.js')
+  , "Lobby":  require('./lobby_page.js')
   , "Edit":   require('./edit_page.js')
   , "Room":   require('./room_page.js')
   , "Battle": require('./battle_page.js')  
@@ -19,22 +20,34 @@ exports.setPage = function(next_page) {
 }
 
 
-misc.http_request("/account/status", {}, function(err, data) {
-  if(err) {
-    window.location = "/index.html";
-    return;
-  }
-  
-  //Handle window load state
-  var obj = JSON.parse(data)
-    , state = obj.state;
+if(misc.session_id) {
+  misc.http_request("/account/status", {}, function(err, data) {
+    if(err) {
+      window.location = "/index.html";
+      return;
+    }
     
-  console.log("initail status = ", obj);
-  if(document.readyState === "complete") {
-    exports.setPage(pages[state]);
-  } else {
-    document.onload = function() {
+    //Handle window load state
+    var obj = JSON.parse(data)
+      , state = obj.state;
+    if(document.readyState === "complete") {
       exports.setPage(pages[state]);
+    } else {
+      document.onreadystatechange = function() {
+        if(document.readyState === "complete") {
+          exports.setPage(pages[state]);
+        }
+      }
+    }
+  });
+} else {
+  if(document.readyState === "complete") {
+    exports.setPage(pages["Login"]);
+  } else {
+    document.onreadystatechange = function() {
+      if(document.readyState === "complete") {
+        exports.setPage(pages["Login"]);
+      }
     }
   }
-});
+}

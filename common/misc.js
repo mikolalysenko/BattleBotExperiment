@@ -90,6 +90,10 @@ function installSocket() {
   ++rcon_count;
   if(rcon_count > 30) {
     throw new Error("Can't connect to server");
+    window.location = "/";
+    return;
+  }
+  if(!exports.session_id) {
     return;
   }
   

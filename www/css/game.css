@@ -13,6 +13,10 @@ canvas {
   background-color:#333333;
 }
 
+#loginPage {
+  display: none;
+}
+
 #lobbyPage {
   display: none;
 }

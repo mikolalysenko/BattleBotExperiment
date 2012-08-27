@@ -6,10 +6,21 @@
 </head>
 
 <body>
+  <div id="loginPage">
+    <h1> Choose a method to login: </h1>
+    <p> You can use your Google ID: </p>
+    <p> <a href="authenticate?identifier=https://www.google.com/accounts/o8/id"><img src="images/google.png" width=120px/></a>  </p>
+    <p> ...or enter your own <img src="images/openid-logo.png" width="50px" alt="OpenID"/> provider: </p>
+    <p> <input type="text" id="customProvider" /> <input type="submit" id="submitCustom" /> </p>
+    <p> ...or just skip it: </p>
+    <p> 
+      <a href="authenticate?identifier=temporary"> Temporary Login <b>(Warning!  No saving!)</b> </a> 
+    </p>  
+  </div>
+
   <div id="lobbyPage">
     <div id="roomsList">
     </div>
-    
     <div id="lobbyPanel" class="rightPanel">
       <div id="lobbyStatus">
         <div id="lobbyPlayerName"> </div>

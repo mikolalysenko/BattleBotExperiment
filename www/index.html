@@ -1,31 +1,121 @@
 <html>
 <head>
-  <title> Select a login provider </title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link  href="css/main.css" rel="stylesheet"/>
+  <title> Physics Creature Battles </title>
+  <script src="/browserify.js"></script>
+	<link  href="css/game.css" rel="stylesheet"/>
 </head>
 
 <body>
-  <div align="center">
-    <p> <img src="images/openid-logo.png" width="300px"/></p>
+  <div id="loginPage">
+    <div align="center" id="loginFloat">
+      <h2> Choose a method to login: </h2>
+      <p> 
+        <a href="authenticate?identifier=https://www.google.com/accounts/o8/id">
+          You can use your <img src="images/google.png" width="100px" alt="Google" /> ID...
+        </a>
+      </p> 
+      <p>
+        ...or enter your own <img src="images/openid-logo.png" width="100px" alt="OpenID" /> provider:
+      </p>
+      <p>
+        <input type="text" id="loginProvider" value="http://your-provider-url.com" />
+        <input type="submit" id="loginCustom" />
+      </p>
+      <p> 
+        <a href="authenticate?identifier=temporary">
+          ...or just skip it. <b>(Warning!  No saving!)</b>
+        </a> 
+      </p>
+    </div>
+  </div>
+
+  <div id="lobbyPage">
+    <div id="roomsList">
+    </div>
+    <div id="lobbyPanel" class="rightPanel">
+      <div id="lobbyStatus">
+        <div id="lobbyPlayerName"> </div>
+      </div>
+      <div id="lobbyButtons">
+        <input type="button" id="lobbyRefresh" value="Refresh" />
+        <input type="button" id="lobbyEdit" value="Edit Creatures" />
+        <p>
+          <input type="button" id="lobbyCreateRoom" value="Create Room" />
+          <input type="text" id="lobbyRoomName" value="Room Name" />
+        </p>
+      </div>
+      <div id="lobbyErrors" class="errorBox"> </div>
+    </div>
+  </div>
   
-    <p> Please login using an OpenID provider: </p>
+  <div id="roomPage">  
+    <div id="roomPanel" class="rightPanel">
+      <div id="roomName"></div>
+      <div id="roomPlayers">
+        Players:
+      </div>
+      <div id="roomButtons">
+        <p>
+          <b>Select your creature:</b>
+          <div id="roomCreatureList"> </div>
+        </p>
+        <p> Ready: <input type="checkbox" id="roomReady" /> </p>
+        <input type="button" id="roomLeave" value="Leave" />
+      </div>
+      <div id="roomErrors" class="errorBox"> </div>
+    </div>
+    <div id="roomChat">
+    </div>
+  </div>
   
-    <p> <a href="authenticate?identifier=https://www.google.com/accounts/o8/id"><img src="images/google.png" width=120px/></a>  </p>
-    
-    <p> ...or enter your own URL: </p>
-    <p> <input type="text" id="customProvider" /> <input type="submit" id="submitCustom" /> </p>
-    
-    <p> ...or just skip it: </p>
-    <p> <a href="authenticate?identifier=temporary"> Temporary Login <b>(Warning!  No saving!)</b> </a> </p>
-    
-<script>
-document.getElementById("submitCustom").addEventListener('click', function(ev) {
-  window.location = window.location.origin + '/authenticate?identifier=' + escape(document.getElementById('customProvider').value);
-});
-</script>
+  <div id="editPage">
+    <div align="center" id="editCreatureName" /></div>
+    <canvas id="editCanvas" width="600" height="400"></canvas>
+    <div id="editPanel" class="rightPanel">
+      <p>
+        Tool:
+        <select id="editTool">
+          <option id="editToolBox" value="box">Box</option>
+          <option id="editToolJoint" value="joint">Joint</option>
+          <option id="editToolMove" value="move">Move</option>
+          <option id="editToolDelete" value="delete">Delete</option>
+        </select>
+      </p>
+      <p>Physics: <input type="checkbox" id="editGravity"/></p>
+      <div id="editCreatureList"> </div>
+      <input type="button" id="editNew" value="New" />
+      <input type="button" id="editSave" value="Save" /> 
+      <input type="button" id="editSaveAs" value="Save As" />
+      <input type="button" id="editLoad" value="Load" />
+      <input type="button" id="editDelete" value="Delete" />
+      <input type="button" id="editBack" value="Back to Lobby" />
+      <div id="editHelp">
+        <p> Click on the canvas to edit creature. </p>
+        <p> Hotkeys: </p>
+        <ul>
+          <li> <b>B</b> - Select Box Tool </li>
+          <li> <b>J</b> - Select Joint Tool </li>
+          <li> <b>M</b> - Select Move Tool </li>
+          <li> <b>D</b> - Select Delete Tool </li>
+          <li> <b>Space</b> - Toggle Physics </li>
+          <li> <b>Ctrl+N</b> - New </li>
+          <li> <b>Ctrl+S</b> - Save </li>
+        </ul>
+      </div>
+      <div id="editErrors" class="errorBox"></div>
+    </div>
+  </div>
   
+  <div id="battlePage">
+    <canvas id="battleCanvas" width="600" height="400"></canvas>
+    <div id="battlePanel" class="rightPanel">
+      <input type="button" id="battleReady" value="Execute" />
+      <input type="button" id="battleResign" value="Resign" />
+    </div>
+    <div id="battleChat">
+    </div>
+    <div id="battleErrors" class="errorBox"></div>
   </div>
 </body>
 </html>
+

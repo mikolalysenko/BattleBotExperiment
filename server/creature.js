@@ -1,7 +1,7 @@
-var ObjectID = require('mongoskin').ObjectID;
+var ObjectID = require('mongoskin').ObjectID
+  , url = require('url');
 
 exports.createCreatureService = function(app, cb) {
-
   function validateCreature(creature_doc, session, cb) {
     if(!('name' in creature_doc)) {
       cb("Missing name", null);
@@ -25,7 +25,7 @@ exports.createCreatureService = function(app, cb) {
     if(validate_status.callbacks.length > 0) {
       function do_validate(err) {
         if(err) {
-          cb(err, null):
+          cb(err, null);
           return;
         }
         var next_cb = validate_status.callbacks[0];
@@ -33,7 +33,7 @@ exports.createCreatureService = function(app, cb) {
         next_cb(do_validate);
       }
       do_validate(null);
-    } else {    
+    } else {
       cb(null, creature_doc);
     }
   }
@@ -142,9 +142,9 @@ exports.createCreatureService = function(app, cb) {
       return;
     }
     
-    console.log(req);
+    //TODO: Read creature from request body
     
-    var creature = req.param("creature", null);
+    var creature = req.body;
     if(!creature) {
       res.writeHead(400);
       res.end("Missing creature");
@@ -187,7 +187,7 @@ exports.createCreatureService = function(app, cb) {
           app.db.creatures.save(creature);
         }
         res.writeHead(200);
-        res.end(JSON.stringify(creature);
+        res.end(JSON.stringify(creature));
         return;
       }
     });

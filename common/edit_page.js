@@ -11,7 +11,10 @@ var misc = require('./misc.js')
   , simulation
   , mouse
   , box_start
-  , drag_joint = null;
+  , drag_joint = null
+  , creature = null
+  , page_loaded = false
+  , creature_list = null;
 
 var b2AABB          = Box2D.Collision.b2AABB
   , b2Vec           = Box2D.Common.Math.b2Vec2
@@ -56,13 +59,123 @@ function drawEditPage() {
   }
 }
 
-function saveEdits() {
-  //TODO: Save edits to server
+function resetCreature() {
+  simulation.addCreature(creature, false, {x:0, y:0}, "EditCreature", [0.8, 0.8, 0.8]);
+  var name = document.getElementById("editCreatureName");
+  name.innerHTML = "";
+  name.appendChild(document.createTextNode(creature.name));
 }
 
+function newCreature() {
+  creature = {
+      name: "Untitled"
+    , bodies: []
+    , joints: []
+  };
+  resetCreature();
+}
+
+function saveCreatureAs() {
+  var creatureName = prompt("Enter a name for this creature:");
+  if(!creatureName) {
+    return;
+  }
+  
+  if('_id' in creature) {
+    delete creature._id;
+  }
+  
+  //Reset name
+  var name = document.getElementById("editCreatureName");
+  name.innerHTML = "";
+  name.appendChild(document.createTextNode(creature.name));
+  
+  //Serialize and save creature
+  var serialized = simulation.getCreature("EditCreature").serialize();
+  creature.name = creatureName;
+  creature.bodies = serialized.bodies;
+  creature.joints = serialized.joints;
+   
+  misc.http_post("/creatures/save", JSON.stringify(creature), function(err, result) {
+    if(!page_loaed) {
+      return;
+    }
+    if(err) {
+      throw new Error(err);
+    }
+    creature._id = result._id;
+    refresh();
+  });
+}
+
+function saveCreature() {
+  if(!creature._id) {
+    saveCreatureAs();
+    return;
+  }
+  
+  //Serialize and save creature
+  var serialized = simulation.getCreature("EditCreature").serialize();
+  creature.bodies = serialized.bodies;
+  creature.joints = serialized.joints;
+   
+  misc.http_post("/creatures/save", JSON.stringify(creature), function(err, result) {
+    if(!page_loaed) {
+      return;
+    }
+    if(err) {
+      throw new Error(err);
+    }
+    creature._id = result._id;
+    refresh();
+  });
+}
+
+function loadCreature() {
+  var creature_id = creature_list.getSelectedCreature();
+  if(!creature_id) {
+    return;
+  }
+
+  //Load creature
+  misc.http_request("/creatures/load", { creature_id: creature_id }, function(err, result) {
+    if(err) {
+      throw new Error(err);
+    }
+    creature = JSON.parse(result);
+    resetCreature();
+    refresh();
+  });
+}
+
+function deleteCreature(creature_id) {
+  var creature_id = creature_list.getSelectedCreature();
+  if(!creature_id) {
+    return;
+  }
+
+  if(creature_id == creature._id) {
+    delete creature._id;
+  }
+  
+  misc.http_request("/creatures/delete", {creature_id: creature_id}, function(err, result) {
+    if(err) {
+      throw new Error(err);
+    }
+    refresh();
+  });
+}
+
+function goBack() {
+  var ok = confirm("Unsaved changes will be lost.  Continue?");
+  if(ok) {
+    require('./entry.js').setPage(require('./lobby_page.js'));
+  }
+}
 
 //Update page
 function refresh() {
+  creature_list.update();
 }
 
 
@@ -179,9 +292,14 @@ function handleClick(tool) {
 //Start page
 exports.startPage = function() {
 
+  page_loaded = true;
+
   error_handler = require('./error_handler.js').createErrorHandler('editErrors');
   var edit_page = document.getElementById("editPage");  
   edit_page.style.display = "block";
+
+  //Create creature list
+  creature_list = require('./creature_list.js').createCreatureList("editCreatureList");
   
   mouse = {x: 0, y:0, down:false };
   box_start = { x:0, y:0, active: false };
@@ -190,15 +308,17 @@ exports.startPage = function() {
   //Register simulation stuff
   simulation = new Game(600/30.0, 400/30.0);
   simulation.setCanvas("editCanvas", 30.0);
-  simulation.addCreature({bodies:[], joints:[]}, false, {x:0, y:0}, "EditCreature", [0.8, 0.8, 0.8]);
-
-  //Set up back button  
-  document.getElementById("editBack").onclick = function() {
-    require('./entry.js').setPage(require('./lobby_page.js'));
-  };
   
-  //Set up save
-  document.getElementById("editSave").onclick = saveEdits();
+  //Reset current creature 
+  newCreature();
+
+  //Set up buttons
+  document.getElementById("editNew").onclick = newCreature;
+  document.getElementById("editSave").onclick = saveCreature;
+  document.getElementById("editSaveAs").onclick = saveCreatureAs;
+  document.getElementById("editLoad").onclick = loadCreature;
+  document.getElementById("editDelete").onclick = deleteCreature;
+  document.getElementById("editBack").onclick = goBack;
 
   //Set up gravity control
   document.getElementById("editGravity").checked = false;
@@ -206,6 +326,7 @@ exports.startPage = function() {
   toggleGravity();
   
   
+    
   //Hook mouse listeners
   var canvas = document.getElementById("editCanvas");
   canvas.onmousedown = function(ev) {
@@ -242,6 +363,12 @@ exports.startPage = function() {
       handleClick(document.getElementById("editTool").value);
     }
   };
+  
+  //Hook hotkeys
+  document.onkeydown = function(ev) {
+    //TODO: Handle hotkeys here
+  }
+
 
   //Start animations
   tick_interval = setInterval(tickEditPage, 20);
@@ -249,8 +376,14 @@ exports.startPage = function() {
 }
 
 exports.stopPage = function() {
+  
+  page_loaded = false;
+  
+  creature_list.destroy();
+
   var canvas = document.getElementById("editCanvas");
   canvas.onmousedown = canvas.onmouseup = canvas.onmousemove = canvas.onmouseout = null;
+  document.onkeypress = null;
   clearInterval(tick_interval);
   simulation = null;
   drag_joint = null;
