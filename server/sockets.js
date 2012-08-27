@@ -48,6 +48,7 @@ exports.createSocketService = function(app, cb) {
       }
       var session = app.accounts.getSession(session_id);
       if(!session) {
+        console.log("Bad/expired session id");
         ws.close()
         return;
       }

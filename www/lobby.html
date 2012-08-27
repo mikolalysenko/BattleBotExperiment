@@ -10,13 +10,13 @@
     <div id="roomsList">
     </div>
     
-    <div id="lobbyPanel">
+    <div id="lobbyPanel" class="rightPanel">
       <div id="lobbyStatus">
         <div id="lobbyPlayerName"> </div>
       </div>
       <div id="lobbyButtons">
         <input type="button" id="lobbyRefresh" value="Refresh" />
-        <input type="button" id="lobbyEdit" value="Evolve Creature" />
+        <input type="button" id="lobbyEdit" value="Edit Machine" />
         <p>
           <input type="button" id="lobbyCreateRoom" value="Create Room" />
           <input type="text" id="lobbyRoomName" value="Room Name" />
@@ -26,11 +26,8 @@
     </div>
   </div>
   
-  <div id="roomPage">
-    <div id="roomChat">
-    </div>
-  
-    <div id="roomPanel">
+  <div id="roomPage">  
+    <div id="roomPanel" class="rightPanel">
       <div id="roomName"></div>
       <div id="roomPlayers">
         Players:
@@ -41,36 +38,39 @@
       </div>
       <div id="roomErrors" class="errorBox"> </div>
     </div>
+    <div id="roomChat">
+    </div>
   </div>
   
   <div id="editPage">
     <canvas id="editCanvas" width="600" height="400"></canvas>
-    <div id="editPanel">
-      <select id="editTool">
-        <option id="editToolBox" value="box">Box</option>
-        <option id="editToolMove" value="move">Move</option>
-        <option id="editToolJoint" value="joint">Joint</option>
-      </select>
-      
+    <div id="editPanel" class="rightPanel">
+      <p>
+        Tool:
+        <select id="editTool">
+          <option id="editToolBox" value="box">Box</option>
+          <option id="editToolJoint" value="joint">Joint</option>
+          <option id="editToolMove" value="move">Move</option>
+          <option id="editToolDelete" value="delete">Delete</option>
+        </select>
+      </p>
+      <p>Physics: <input type="checkbox" id="editGravity"/></p>
       <input type="button" id="editSave" value="Save" />
+      <input type="button" id="editLoad" value="Reload" />
       <input type="button" id="editBack" value="Back to Lobby" />
-    
-      <p>Paused: <input type="checkbox" id="editPaused"/></p>
       <div id="editErrors" class="errorBox"></div>
     </div>
   </div>
   
   <div id="battlePage">
-    <div id="battleChat">
-    </div>
-    <canvas id="battleCanvas"></canvas>
-    <div id="battleErrors" class="errorBox"></div>
-    <div id="battlePanel">
-      Status
-      
+    <canvas id="battleCanvas" width="600" height="400"></canvas>
+    <div id="battlePanel" class="rightPanel">
       <input type="button" id="battleReady" value="Execute" />
       <input type="button" id="battleResign" value="Resign" />
     </div>
+    <div id="battleChat">
+    </div>
+    <div id="battleErrors" class="errorBox"></div>
   </div>
 </body>
 </html>

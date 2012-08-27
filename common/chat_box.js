@@ -10,6 +10,7 @@ exports.createChatBox = function(dom_element) {
   var chat_log = document.createElement("div");
   chat_log.style["overflow-y"] = "auto";
   chat_log.style["overflow-x"] = "hidden";
+  chat_log.style.height = "100%";
   chat_box.appendChild(chat_log);
   chat_log.innerHTML = "<b>Joining chat...</b>";
   
@@ -26,6 +27,7 @@ exports.createChatBox = function(dom_element) {
     }
   };  
   chat_box.appendChild(chat_text);
+  chat_box.style.width = "100%";
   
   function chatListener(obj) {
     chat_log.appendChild(document.createElement("br"));

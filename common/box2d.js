@@ -6012,7 +6012,7 @@ Box2D.postDefs = [];
                var ud = f.GetBody().GetUserData();
                if(ud && 'color' in ud) {
                  color.Set(ud.color[0], ud.color[1], ud.color[2]);
-                 this.DrawSahpe(s, xf, color);
+                 this.DrawShape(s, xf, color);
                }
                else if (b.IsActive() == false) {
                   color.Set(0.5, 0.5, 0.3);
