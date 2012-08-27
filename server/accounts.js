@@ -40,6 +40,7 @@ exports.createAccountService = function(app, cb) {
     if(!this.logged_in) {
       return;
     }
+    this.emit("save");
     app.db.accounts.save(this.account);
   }
   
@@ -57,12 +58,13 @@ exports.createAccountService = function(app, cb) {
       return;
     }
   
+    this.emit("save");
+  
     this.account.logged_in = false;
     delete account_index[this.account._id];
     delete sessions[this.session_id];
     
     this.emit('logout');
-    
     app.db.accounts.save(this.account);
   }
   

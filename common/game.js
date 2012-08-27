@@ -209,7 +209,7 @@ function Game(world_x, world_y) {
   this.world_dims = new b2Vec(world_x, world_y);
   this.draw_scale = 30.0;
   this.creatures = {};
-  this.damping_factor = 0.0;
+  this.damping_factor = 0.01;
   this.edit_mode = false;
   
   //Create arena boundaries

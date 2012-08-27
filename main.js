@@ -73,6 +73,8 @@ async.series([
     require('./server/sockets.js').createSocketService(app, cb);
   }, function(cb) {
     require('./server/lobby.js').createLobbyService(app, cb);
+  }, function(cb) {
+    require('./server/creature.js').createCreatureService(app, cb);
   }
 ], function(err, result) {
 

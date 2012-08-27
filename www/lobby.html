@@ -33,6 +33,7 @@
         Players:
       </div>
       <div id="roomButtons">
+        <div id="roomCreatureList"> </div>
         <p> Ready: <input type="checkbox" id="roomReady" /> </p>
         <input type="button" id="roomLeave" value="Leave" />
       </div>
@@ -43,6 +44,7 @@
   </div>
   
   <div id="editPage">
+    <div align="center" id="editCreatureName" />Untitled Creature</div>
     <canvas id="editCanvas" width="600" height="400"></canvas>
     <div id="editPanel" class="rightPanel">
       <p>
@@ -55,8 +57,9 @@
         </select>
       </p>
       <p>Physics: <input type="checkbox" id="editGravity"/></p>
-      <input type="button" id="editSave" value="Save" />
-      <input type="button" id="editLoad" value="Reload" />
+      <div id="editCreatureList"> </div>
+      <input type="button" id="editSave" value="Save" /> 
+      <input type="button" id="editSaveAs" value="Save As" />
       <input type="button" id="editBack" value="Back to Lobby" />
       <div id="editErrors" class="errorBox"></div>
     </div>
@@ -74,3 +77,4 @@
   </div>
 </body>
 </html>
+

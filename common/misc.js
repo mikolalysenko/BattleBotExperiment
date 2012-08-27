@@ -42,6 +42,34 @@ exports.http_request = function(path, params, cb) {
   XHR.send();
 };
 
+
+
+exports.http_post = function(path, params, cb) {
+  var url = url_base + path + query_base;
+  var XHR = new XMLHttpRequest();
+  XHR.open('POST', url, true);
+  
+  var timeout = setTimeout(function() {
+    cb("Request timed out", null);
+    XHR.abort();
+  }, 30 * 1000);
+  
+  XHR.onreadystatechange = function(ev) {
+    if(XHR.readyState !== 4) {
+      return;
+    }
+    clearTimeout(timeout);
+    if(XHR.status !== 200) {
+      cb(XHR.responseText, null);
+    } else {
+      cb(null, XHR.responseText);
+    }
+  };
+  
+  XHR.send(params);
+};
+
+
 //Wrapper over web socket connection
 var EventEmitter = require("events").EventEmitter
   , connection = new EventEmitter()

@@ -84,7 +84,7 @@ function toggleGravity() {
       bodies[i].SetAngularDamping(0.01);
       bodies[i].SetAwake(true);
     }
-    simulation.damping_factor = 1.5;
+    simulation.damping_factor = 0.01;
   }
 }
 
