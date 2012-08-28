@@ -44,6 +44,19 @@ exports.createLoggingService = function(app, cb) {
     });
   });
   
+  app.on('create_creature', function(creature, params) {
+    console.log("Creating creature:", creature, ', params: ', params);
+  });
+  app.on('update_creature', function(old_creature, params) {
+    console.log("Updating creature:", old_creature, ", params: ", params);
+  });
+  app.on('get_creature', function(response, creature_doc, session) {
+    console.log("Retreiving creature (", session.account._id, ") : ", response, ";  Database: ", creature_doc);
+  });
+  app.on('delete_creature', function(creature) {
+    console.log("Deleting creature:", creature);
+  });
+  
   app.browserify.on('syntaxError', function(error) {
     console.log("Syntax Error:", error);
   });
@@ -51,6 +64,7 @@ exports.createLoggingService = function(app, cb) {
   app.browserify.on("bundle", function() {
     console.log("Bundle Regenerated");
   });
+
   
   cb(null);
 };

@@ -8,6 +8,13 @@ exports.createCreatureService = function(app, cb) {
       return;
     }
     
+    if('_id' in creature_doc) {
+      if(typeof(creature_doc._id) !== 'string') {
+        cb("Invalid creature id", null);
+        return;
+      }
+    }
+    
     //Do a local synchronous validation
     var validate_status = {
         valid: true
@@ -52,6 +59,7 @@ exports.createCreatureService = function(app, cb) {
         created_at:     new Date()
       , last_modified:  new Date()
       , deleted:        false
+      , name:           creature_doc.name
       , account_id:     creature_doc.account_id
       , bodies:         creature_doc.bodies
       , joints:         creature_doc.joints
@@ -87,6 +95,7 @@ exports.createCreatureService = function(app, cb) {
       if(session.creatures.length > 0) {      
         app.db.creatures.insert(session.creatures)
       }
+      console.log("Finished downloading creatures");
       session.creatures = result.concat(session.creatures);
       session.wait_for_creatures = false;
     });
@@ -118,10 +127,24 @@ exports.createCreatureService = function(app, cb) {
       return;
     }
     
+    console.log(parsed_url);
+    
+    console.log(creature_id);
+    
     var creature = session.getCreature(creature_id);
     if(creature) {
+      
+      var local_copy = {
+          _id:    creature._id.toString()
+        , name:   creature.name
+        , bodies: creature.bodies
+        , joints: creature.joints
+      };
+      
+      app.emit("get_creature", local_copy, creature, session);
+    
       res.writeHead(200);
-      res.end(JSON.stringify(session.creatures[i]));
+      res.end(JSON.stringify(local_copy));
       return;
     } else {
       res.writeHead(400);
@@ -143,7 +166,6 @@ exports.createCreatureService = function(app, cb) {
     }
     
     //TODO: Read creature from request body
-    
     var creature = req.body;
     if(!creature) {
       res.writeHead(400);
@@ -151,7 +173,7 @@ exports.createCreatureService = function(app, cb) {
       return;
     }
     
-    validateCreature(JSON.parse(creature), session, function(err, creature_doc) {
+    validateCreature(creature, session, function(err, creature_doc) {
       if(err) {
         res.writeHead(400);
         res.end(err);
@@ -160,20 +182,21 @@ exports.createCreatureService = function(app, cb) {
       
       creature_doc.account_id = session.account._id;
       
-      if('_id' in creature_obj) {
+      console.log(creature_doc);
+      
+      if('_id' in creature_doc) {
         if(session.wait_for_creatures) {
           res.writeHead(400);
           res.end("Waiting for database");
           return;
         }
         
-        //Look up creature
-        creature_doc._id = new ObjectID(creature_doc._id);
+        //Look up creature in list
         var creature = session.getCreature(creature_doc._id);
         if(creature) {
-          updateCreature(session.creatures[i], creature_doc);
+          updateCreature(creature, creature_doc);
           res.writeHead(200);
-          res.end(JSON.stringify(session.creature));
+          res.end(creature._id.toString());
           return;
         } else {
           res.writeHead(400);
@@ -184,11 +207,16 @@ exports.createCreatureService = function(app, cb) {
         var creature = createNewCreature(creature_doc);
         session.creatures.push(creature);
         if(!session.wait_for_creatures) {
-          app.db.creatures.save(creature);
+          app.db.creatures.save(creature, function(err, result) {
+            res.writeHead(200);
+            res.end(result._id.toString());
+            return;
+          });
+        } else {
+          res.writeHead(400);
+          res.end("Database is lagging.  Please wait a few moments for changes to propagate.");
+          return;
         }
-        res.writeHead(200);
-        res.end(JSON.stringify(creature));
-        return;
       }
     });
   });
@@ -206,7 +234,7 @@ exports.createCreatureService = function(app, cb) {
     }
     
     var creature_id = parsed_url.query["creature_id"];
-    if(!creature_id) {
+    if(!creature_id || typeof(creature_id) != "string") {
       res.writeHead(400);
       res.end("Missing creature_id");
       return;
@@ -221,8 +249,14 @@ exports.createCreatureService = function(app, cb) {
     var obj_id = new ObjectID(creature_id);
     for(var i=0; i<session.creatures.length; ++i) {
       if(obj_id.equals(session.creatures[i]._id)) {
-        session.creatures[i].deleted = true;
-        app.db.creatures.save(session.creatures[i]);
+        var C = session.creatures[i];
+        session.creatures.splice(i, 1);
+        
+        C.deleted = true;
+        C.deleted_at = new Date();
+        app.emit("delete_creature", C);
+        app.db.creatures.save(C);
+        
         res.writeHead(200);
         res.end("Success");
         return;
@@ -253,7 +287,7 @@ exports.createCreatureService = function(app, cb) {
       if(session.creatures[i]._id) {
         result.push({
             name:session.creatures[i].name
-          , creature_id: session.creatures[i]._id
+          , creature_id: session.creatures[i]._id.toString()
         });
       }
     }

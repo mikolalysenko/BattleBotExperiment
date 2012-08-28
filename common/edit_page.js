@@ -61,9 +61,7 @@ function drawEditPage() {
 
 function resetCreature() {
   simulation.addCreature(creature, false, {x:0, y:0}, "EditCreature", [0.8, 0.8, 0.8]);
-  var name = document.getElementById("editCreatureName");
-  name.innerHTML = "";
-  name.appendChild(document.createTextNode(creature.name));
+  refresh();
 }
 
 function newCreature() {
@@ -85,25 +83,22 @@ function saveCreatureAs() {
     delete creature._id;
   }
   
-  //Reset name
-  var name = document.getElementById("editCreatureName");
-  name.innerHTML = "";
-  name.appendChild(document.createTextNode(creature.name));
-  
   //Serialize and save creature
   var serialized = simulation.getCreature("EditCreature").serialize();
   creature.name = creatureName;
   creature.bodies = serialized.bodies;
   creature.joints = serialized.joints;
+  refresh();
    
-  misc.http_post("/creatures/save", JSON.stringify(creature), function(err, result) {
-    if(!page_loaed) {
+  misc.http_post("/creatures/save", creature, function(err, result) {
+    if(!page_loaded) {
       return;
     }
     if(err) {
       throw new Error(err);
     }
-    creature._id = result._id;
+    
+    creature._id = result;
     refresh();
   });
 }
@@ -119,29 +114,28 @@ function saveCreature() {
   creature.bodies = serialized.bodies;
   creature.joints = serialized.joints;
    
-  misc.http_post("/creatures/save", JSON.stringify(creature), function(err, result) {
-    if(!page_loaed) {
+  misc.http_post("/creatures/save", creature, function(err, result) {
+    if(!page_loaded) {
       return;
     }
     if(err) {
       throw new Error(err);
     }
-    creature._id = result._id;
     refresh();
   });
 }
 
 function loadCreature() {
-  var creature_id = creature_list.getSelectedCreature();
-  if(!creature_id) {
+  var entry = creature_list.getSelectedCreature();
+  if(!entry) {
     return;
   }
 
   //Load creature
-  misc.http_request("/creatures/load", { creature_id: creature_id }, function(err, result) {
+  misc.http_request("/creatures/get", { creature_id: entry.creature_id }, function(err, result) {
     if(err) {
       throw new Error(err);
-    }
+    } 
     creature = JSON.parse(result);
     resetCreature();
     refresh();
@@ -149,16 +143,18 @@ function loadCreature() {
 }
 
 function deleteCreature(creature_id) {
-  var creature_id = creature_list.getSelectedCreature();
-  if(!creature_id) {
+  var entry = creature_list.getSelectedCreature();
+  if(!entry) {
     return;
   }
 
-  if(creature_id == creature._id) {
+  if(entry.creature_id == creature._id) {
+    creature.name = "Untitled";
     delete creature._id;
+    refresh();
   }
   
-  misc.http_request("/creatures/delete", {creature_id: creature_id}, function(err, result) {
+  misc.http_request("/creatures/delete", {creature_id: entry.creature_id}, function(err, result) {
     if(err) {
       throw new Error(err);
     }
@@ -175,7 +171,10 @@ function goBack() {
 
 //Update page
 function refresh() {
-  creature_list.update();
+  creature_list.update();  
+  var name = document.getElementById("editCreatureName");
+  name.innerHTML = "";
+  name.appendChild(document.createTextNode(creature.name));
 }
 
 
@@ -369,10 +368,11 @@ exports.startPage = function() {
     //TODO: Handle hotkeys here
   }
 
-
   //Start animations
   tick_interval = setInterval(tickEditPage, 20);
   animate.onframe = drawEditPage;
+  
+  refresh();
 }
 
 exports.stopPage = function() {

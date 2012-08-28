@@ -178,10 +178,10 @@ Creature.prototype.serialize = function() {
       , pos = J.GetAnchorA();
     for(var j=0; j<bodies.length; ++j) {
       if(bodies[j] === abod) {
-        a = j;
+        aidx = j;
       }
       if(bodies[j] === bbod) {
-        b = j;
+        bidx = j;
       }
     }
     joints_serialized.push({

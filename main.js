@@ -26,6 +26,7 @@ var path = require('path')
   
 server.use(express.static(path.join(__dirname, 'www')));
 server.use(express.static(path.join(__dirname, 'common')));
+server.use(express.bodyParser());
 server.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 
 //Add browserify imports

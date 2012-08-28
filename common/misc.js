@@ -48,6 +48,7 @@ exports.http_post = function(path, params, cb) {
   var url = url_base + path + query_base;
   var XHR = new XMLHttpRequest();
   XHR.open('POST', url, true);
+  XHR.setRequestHeader("Content-Type", "application/json");
   
   var timeout = setTimeout(function() {
     cb("Request timed out", null);
@@ -66,7 +67,7 @@ exports.http_post = function(path, params, cb) {
     }
   };
   
-  XHR.send(params);
+  XHR.send(JSON.stringify(params));
 };
 
 
