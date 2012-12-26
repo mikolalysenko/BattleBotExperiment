@@ -19,53 +19,23 @@ for(var arg in argv) {
   }
 }
 
-//Initialize server
-var path = require('path')
-  , express = require('express')
-  , server = express();
-  
-server.use(express.static(path.join(__dirname, 'www')));
-server.use(express.static(path.join(__dirname, 'common')));
-server.use(express.bodyParser());
-server.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-
-//Add browserify imports
-var browserify = require('browserify')(
-  (options.debug ? {
-      watch: true
-    , cache: false
-    , exports: ['require']
-  } : {
-      cache:true
-    , exports: ['require']
-  }));
-browserify.addEntry('./common/entry.js');
-if(!options.debug) {
-  //TODO: Add uglify JS here
-}
-
-server.use(browserify);
-
-
 //Initialize application and various subsystems
-var async = require('async')
-  , mongo = require('mongoskin')
-  , EventEmitter = require('events').EventEmitter
+var EventEmitter = require('events').EventEmitter
   , app = new EventEmitter();
 
-//Save options and server in application
-app.server = server;
-app.http_server = require('http').createServer(server);
 app.options = options;
-app.db = mongo.db(options.db_url);
-app.browserify = browserify;
 
+//Add mongo db server
+app.db = require('mongoskin').db(options.db_url);
 
 //Initialize subsystems
 console.log("Initializing server...");
+var async = require('async');
 async.series([
   function(cb) {
     require('./server/logger.js').createLoggingService(app, cb);
+  }, function(cb) {
+    require('./server/web.js').createWebService(app, cb);
   }, function(cb) {
     require('./server/authenticate.js').createAuthenticationService(app, cb); 
   }, function(cb) {
@@ -78,20 +48,16 @@ async.series([
     require('./server/creature.js').createCreatureService(app, cb);
   }
 ], function(err, result) {
-
-  //Generate bundle immediately
-  browserify.bundle();
-
-  app.http_server.listen(options.http_port);
-
   if(err) {
     console.log("Error Initializing Server:", err);
     process.exit(-1);
-  } else {
-    process.on('uncaughtException', function(err) {
-      console.log("Uncaught error:", err.stack);
-    });
-    console.log("Server initialized");
   }
+  process.on('uncaughtException', function(err) {
+    console.log("Uncaught error:", err.stack);
+  });
+  app.http_server.listen(options.http_port);
+  app.emit("started");
+  console.log("Server initialized");
 });
+
 
